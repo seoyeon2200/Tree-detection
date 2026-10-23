@@ -20,10 +20,8 @@ public class TreeJsonServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        try (InputStream input =
-                getServletContext().getResourceAsStream(
+        try (InputStream input = getServletContext().getResourceAsStream(
                     "/data/GJ-S1_Tree_data.json")) {
-
             if (input == null) {
                 response.sendError(
                     HttpServletResponse.SC_NOT_FOUND,

@@ -50,11 +50,9 @@ public class LasFileServlet extends HttpServlet {
                     throw new IOException("올바른 LAS 파일이 아닙니다.");
                 }
 
-                ByteBuffer initial = ByteBuffer.wrap(first)
-                        .order(ByteOrder.LITTLE_ENDIAN);
+                ByteBuffer initial = ByteBuffer.wrap(first).order(ByteOrder.LITTLE_ENDIAN);
 
-                int headerSize =
-                        Short.toUnsignedInt(initial.getShort(94));
+                int headerSize = Short.toUnsignedInt(initial.getShort(94));
 
                 if (headerSize < MIN_HEADER_SIZE) {
                     throw new IOException("LAS 헤더 크기가 올바르지 않습니다.");
@@ -68,12 +66,11 @@ public class LasFileServlet extends HttpServlet {
                         header, first.length, headerSize - first.length
                     );
                 }
+                
+                // 점군 데이터 시작
+                ByteBuffer h = ByteBuffer.wrap(header).order(ByteOrder.LITTLE_ENDIAN);
 
-                ByteBuffer h = ByteBuffer.wrap(header)
-                        .order(ByteOrder.LITTLE_ENDIAN);
-
-                long pointOffset =
-                        Integer.toUnsignedLong(h.getInt(96));
+                long pointOffset = Integer.toUnsignedLong(h.getInt(96));
 
                 int formatByte = Byte.toUnsignedInt(header[104]);
 
@@ -85,20 +82,16 @@ public class LasFileServlet extends HttpServlet {
                 }
 
                 int format = formatByte & 0x3F;
-                int recordLength =
-                        Short.toUnsignedInt(h.getShort(105));
+                int recordLength = Short.toUnsignedInt(h.getShort(105));
 
-                long totalPoints =
-                        Integer.toUnsignedLong(h.getInt(107));
+                long totalPoints = Integer.toUnsignedLong(h.getInt(107));
 
                 // LAS 1.4 확장 점 개수 필드
                 if (totalPoints == 0 && headerSize >= 255) {
                     totalPoints = h.getLong(247);
 
                     if (totalPoints < 0) {
-                        throw new IOException(
-                            "지원할 수 없는 LAS 점 개수입니다."
-                        );
+                        throw new IOException("지원할 수 없는 LAS 점 개수입니다.");
                     }
                 }
 
@@ -162,15 +155,10 @@ public class LasFileServlet extends HttpServlet {
                 );
 
                 double step = (double) totalPoints / pointCount;
-
                 byte[] record = new byte[recordLength];
 
-                response.setContentType(
-                    "application/octet-stream"
-                );
-                response.setHeader(
-                    "Cache-Control", "no-store"
-                );
+                response.setContentType("application/octet-stream");
+                response.setHeader("Cache-Control", "no-store");
 
                 // 응답 헤더: 점 개수 4바이트 + RGB 여부 1바이트
                 DataOutputStream output = new DataOutputStream(
@@ -184,12 +172,8 @@ public class LasFileServlet extends HttpServlet {
                 long previousIndex = -1;
 
                 for (int i = 0; i < pointCount; i++) {
-
-                    long sourceIndex =
-                            (long) Math.floor(i * step);
-
-                    long recordsToSkip =
-                            sourceIndex - previousIndex - 1;
+                    long sourceIndex = (long) Math.floor(i * step);
+                    long recordsToSkip = sourceIndex - previousIndex - 1;
 
                     skipFully(
                         input, recordsToSkip * recordLength
@@ -226,13 +210,6 @@ public class LasFileServlet extends HttpServlet {
                 }
 
                 output.flush();
-
-                System.out.println(
-                    "LAS 전체 점 개수: " + totalPoints
-                );
-                System.out.println(
-                    "전송 점 개수: " + pointCount
-                );
             }
         } catch (IOException e) {
             if (!response.isCommitted()) {
@@ -262,7 +239,6 @@ public class LasFileServlet extends HttpServlet {
 
     private static void skipFully(
             InputStream input, long bytes) throws IOException {
-
         while (bytes > 0) {
             long skipped = input.skip(bytes);
 

@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LAS Viewer</title>
+  <title>수목 3D Viewer</title>
+  <link rel="stylesheet" href="./css/viewer.css">
   <script type="importmap">
   {
     "imports": {
@@ -12,309 +13,40 @@
     }
   }
   </script>
-  <style>
-	    * {
-	      box-sizing: border-box;
-	    }
-	
-	    body {
-	      margin: 0;
-	      font-family: Arial, "Malgun Gothic", sans-serif;
-	      background: #10151f;
-	      color: #edf2f7;
-	    }
-	
-	    header {
-	      padding: 18px 24px;
-	      background: #192231;
-	      border-bottom: 1px solid #344054;
-	    }
-	
-	    header h1 {
-	      margin: 0 0 8px;
-	      font-size: 21px;
-	    }
-	
-	    #status {
-	      padding: 12px 24px;
-	      color: #c4d2e4;
-	      font-size: 13px;
-	      overflow-wrap: anywhere;
-	    }
-	
-	    #viewer {
-	      width: 100%;
-	      height: calc(100vh - 100px);
-	      min-height: 400px;
-	      position: relative;
-	    }
-	
-	    #viewer canvas {
-	      display: block;
-	      width: 100%;
-	      height: 100%;
-	    }
-	</style>
 </head>
-
 <body>
-<header>
-  <h1>LAS Viewer</h1>
-</header>
-<div id="status">LAS 파일을 불러오는 중...</div>
-<div id="viewer"></div>
+  <header class="header">
+    <h1>Las Viewer</h1>
+    <div id="status" role="status">데이터를 불러오는 중...</div>
+  </header>
 
-<script type="module">
-import * as THREE from "three";
-import { TrackballControls } from "three/addons/controls/TrackballControls.js";
+  <main class="app-layout">
+    <section id="viewer" aria-label="3D 수목 시각화"></section>
 
-const viewer = document.getElementById("viewer");
-const status = document.getElementById("status");
-const fileInput = document.getElementById("lasFile");
+    <section class="bottom-panel">
+      <section class="tree-list-panel">
+        <div class="panel-heading">
+          <h2>나무 목록</h2>
+          <span id="tree-count">0개</span>
+        </div>
 
-// 1. Three.js 기본 설정
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x10151f);
+        <div id="tree-list" class="tree-list">
+          <p class="empty-message">나무 정보</p>
+        </div>
+      </section>
 
-const camera = new THREE.PerspectiveCamera(
-  60, viewer.clientWidth / viewer.clientHeight, 0.1, 1000000
-);
-camera.position.set(0, -100, 100);
+      <section class="tree-detail-panel">
+        <div class="panel-heading">
+          <h2>나무 상세 정보</h2>
+        </div>
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setSize(viewer.clientWidth, viewer.clientHeight);
-viewer.appendChild(renderer.domElement);
+        <div id="tree-detail" class="tree-detail">
+          <p class="empty-message">나무를 선택해 주세요.</p>
+        </div>
+      </section>
+    </section>
+  </main>
 
-// TrackballControls 설정
-const controls = new TrackballControls(
-  camera,
-  renderer.domElement
-);
-
-// 회전 속도
-controls.rotateSpeed = 4.0;
-
-// 확대 축소 설정
-controls.zoomSpeed = 0.7;
-controls.noZoom = false;
-
-// 화면 이동 설정
-controls.panSpeed = 0.8;
-controls.noPan = false;
-
-// 회전 효과
-controls.staticMoving = false;
-
-function animate() {
-  requestAnimationFrame(animate);
-  controls.update();
-  renderer.render(scene, camera);
-}
-animate();
-
-// 2. LAS 파일 파싱
-
-function parseSampledLAS(buffer) {
-  const view = new DataView(buffer);
-
-  // Java 응답 헤더
-  const pointCount = view.getUint32(0, false);
-  const hasRGB = view.getUint8(4) === 1;
-
-  const positions = new Float32Array(pointCount * 3);
-  const colors = hasRGB
-    ? new Float32Array(pointCount * 3)
-    : null;
-
-  let offset = 5;
-  let maxRGB = 0;
-
-  for (let i = 0; i < pointCount; i++) {
-    const j = i * 3;
-
-    positions[j] = view.getFloat32(offset, false);
-    offset += 4;
-
-    positions[j + 1] = view.getFloat32(offset, false);
-    offset += 4;
-
-    positions[j + 2] = view.getFloat32(offset, false);
-    offset += 4;
-
-    if (colors) {
-      for (let channel = 0; channel < 3; channel++) {
-        const value = view.getUint16(offset, false);
-        colors[j + channel] = value;
-        maxRGB = Math.max(maxRGB, value);
-        offset += 2;
-      }
-    }
-  }
-
-  if (colors) {
-    const divisor = maxRGB <= 255 ? 255 : 65535;
-
-    for (let i = 0; i < colors.length; i++) {
-      colors[i] /= divisor;
-      colors[i] = Math.min(1, Math.pow(colors[i], 1.5));
-    }
-  }
-
-  return { positions, colors };
-}
-
-// 3. LAS 파일과 JSON 나무 정보를 불러와 표시
-async function loadLAS() {
-  try {
-    status.textContent = "LAS 파일을 불러오는 중...";
-
-    // 1. LAS 파일 불러오기
-    const response = await fetch("./api/las");
-
-    if (!response.ok) {
-      throw new Error(
-        `LAS 파일을 불러오지 못했습니다. HTTP ${response.status}`
-      );
-    }
-
-    const buffer = await response.arrayBuffer();
-	const data = parseSampledLAS(buffer);
-
-    // 2. JSON 나무 정보 불러오기
-    const jsonResponse = await fetch("./api/trees");
-
-    if (!jsonResponse.ok) {
-      throw new Error(
-        `JSON 파일을 불러오지 못했습니다. HTTP ${jsonResponse.status}`
-      );
-    }
-
-    const treeJson = await jsonResponse.json();
-    const trees = treeJson.data;
-
-    if (!Array.isArray(trees)) {
-      throw new Error("JSON 파일에 data 배열이 없습니다.");
-    }
-
-    // 3. LAS 점군 생성
-    const geometry = new THREE.BufferGeometry();
-
-    geometry.setAttribute(
-      "position",
-      new THREE.BufferAttribute(data.positions, 3)
-    );
-
-    if (data.colors) {
-      geometry.setAttribute(
-        "color",
-        new THREE.BufferAttribute(data.colors, 3)
-      );
-    }
-
-    geometry.computeBoundingSphere();
-
-    const sphere = geometry.boundingSphere;
-    const center = sphere.center.clone();
-
-    const material = new THREE.PointsMaterial({
-      size: 0.1,
-      vertexColors: Boolean(data.colors),
-      color: data.colors ? 0xffffff : 0x62d5fa,
-      sizeAttenuation: false
-    });
-
-    const pointCloud = new THREE.Points(geometry, material);
-    scene.add(pointCloud);
-
-    // 4. JSON 좌표를 이용해 나무별 네모 상자 생성
-    const lineMaterial = new THREE.LineBasicMaterial({
-      color: 0x4F7942
-    });
-
-    trees.forEach((tree) => {
-      const x = Number(tree.easting);
-      const y = Number(tree.northing);
-      const z = Number(tree.elevationM);
-
-      const height = Number(tree.treeHeightM);
-
-      // 수관의 남북 폭과 동서 폭을 사용
-      const width = Number(tree.crownWidthEwM ?? tree.crownWidthM);
-      const depth = Number(tree.crownWidthSnM ?? tree.crownWidthM);
-
-      // 좌표 또는 크기가 유효하지 않으면 건너뛰기
-      if (
-        ![x, y, z, height, width, depth].every(Number.isFinite) ||
-        height <= 0 ||
-        width <= 0 ||
-        depth <= 0
-      ) {
-        console.warn("유효하지 않은 나무 데이터:", tree.treeId);
-        return;
-      }
-
-      // 나무 크기에 맞는 상자 생성
-      const boxGeometry = new THREE.BoxGeometry(
-        width,
-        depth,
-        height
-      );
-
-      const boxEdges = new THREE.EdgesGeometry(boxGeometry);
-
-      const treeBox = new THREE.LineSegments(
-        boxEdges,
-        lineMaterial
-      );
-
-      // JSON 좌표를 기준으로 상자 배치
-      // elevationM은 나무 밑부분의 높이라는 가정
-      treeBox.position.set(
-        x,
-        y,
-        z + height / 2
-      );
-
-      // 나무 ID를 상자 객체에 저장
-      treeBox.name = tree.treeId;
-      treeBox.userData = {
-        treeId: tree.treeId,
-        label: tree.label,
-        speciesCode: tree.speciesCode
-      };
-
-      scene.add(treeBox);
-    });
-
-    // 5. 화면 회전 중심은 점군 중심
-    controls.target.copy(center);
-
-    const distance = Math.max(sphere.radius * 2.5, 1);
-
-    camera.position.set(
-      center.x + distance,
-      center.y - distance,
-      center.z + distance
-    );
-
-    camera.lookAt(center);
-
-    controls.handleResize();
-    controls.update();
-
-    status.textContent =
-      `LAS 표시 완료 | 상자 표시 완료`;
-
-  } catch (error) {
-    status.textContent = "오류: " + error.message;
-    console.error(error);
-  }
-}
-
-// 페이지 실행 시 자동 로드
-loadLAS();
-
-</script>
+  <script type="module" src="./js/main.js"></script>
 </body>
 </html>

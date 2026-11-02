@@ -1,52 +1,395 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>수목 3D Viewer</title>
-  <link rel="stylesheet" href="./css/viewer.css">
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
-      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
-    }
-  }
-  </script>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=2.0">
+    <meta name="format-detection" content="telephone=no, address=no, email=no">
+    <meta charset="UTF-8">
+
+    <title>차량기반 도심 수목 유지관리를 위한 LIDAR · AI기반 통합플랫폼</title>
+
+    <!-- CSS 링크 -->
+    <link rel="stylesheet" type="text/css" href="./css/XEIcon-2.2.0/xeicon.min.css">
+    <link rel="stylesheet" type="text/css" href="./css/reset.css">
+    <link rel="stylesheet" type="text/css" href="./css/variables.css">
+    <link rel="stylesheet" type="text/css" href="./css/layout.css">
+    <link rel="stylesheet" type="text/css" href="./css/component.css">
+    <link rel="stylesheet" type="text/css" href="./css/main.css">
+    <link rel="stylesheet" type="text/css" href="./css/sub.css">
+
+    <!-- JS 링크 -->
+    <script src="./js/lib/chart.umd.min.js" defer></script>
+    <script src="./js/common.js" defer></script>
+    <script src="./js/main.js" defer></script>
+    <script src="./js/sub.js" defer></script>
 </head>
+
 <body>
-  <header class="header">
-    <h1>Las Viewer</h1>
-    <div id="status" role="status">데이터를 불러오는 중...</div>
-  </header>
+    <div class="l-app">
+        <!-- 오른쪽: top네비 + 컨텐츠 -->
+        <div class="l-wrap">
+            <!-- TOP 네비 -->
+            <header class="l-header">
 
-  <main class="app-layout">
-    <section id="viewer" aria-label="3D 수목 시각화"></section>
+                <!-- 숨겨져있다가 사이드네비 접히면 노출되는 로고 -->
+                <div class="l-header__left">
+                    <a class="l-header__logo" href="./index.html">
+                        <span class="l-header__logo-text">
+                            <span class="l-header__logo-text-sub">차량 기반 도심 수목 유지관리를 위한</span>
+                            <span class="l-header__logo-text-main"><strong>LiDAR·AI</strong> 기반 통합플랫폼</span>
+                        </span>
+                    </a>
+                </div>
 
-    <section class="bottom-panel">
-      <section class="tree-list-panel">
-        <div class="panel-heading">
-          <h2>나무 목록</h2>
-          <span id="tree-count">0개</span>
+                <!-- 현재 페이지 표시 (1~3 depth: li만 추가/삭제) -->
+                <nav class="l-header__page" aria-label="현재 위치">
+                    <ol class="l-header__breadcrumb">
+                        <li class="l-header__breadcrumb-item">AI분석</li>
+                        <li class="l-header__breadcrumb-item">수목분석</li>
+                        <li class="l-header__breadcrumb-item" aria-current="page">수목 객체 탐지</li>
+                    </ol>
+                </nav>
+
+                <!-- 사용자 정보, 알림, 로그아웃 버튼 -->
+                <div class="l-header__utils">
+                    <span class="l-header__user">관리자 <strong>홍길동</strong>님</span>
+                    <span class="l-header__divider" aria-hidden="true"></span>
+                    <button class="l-header__icon l-header__icon--bell has-alarm" type="button" aria-label="알림"></button>
+                    <button class="l-header__icon l-header__icon--logout" type="button" aria-label="로그아웃"></button>
+                </div>
+
+                <!-- 모바일(≤1000px): 햄버거 → 사이드 메뉴 -->
+                <button
+                    class="l-header__menu"
+                    type="button"
+                    aria-label="메뉴 열기"
+                    aria-controls="lSidebar"
+                    aria-expanded="false"
+                    data-mobile-nav-toggle
+                ></button>
+            </header>
+
+            <div class="l-body">
+                <div class="l-detect">
+                    <!-- 상단 컨트롤 바 -->
+                    <div class="l-detect__toolbar">
+                        <div class="c-file-field l-detect__file">
+                            <label class="c-file-field__label" for="detectLidarFile">LiDAR 파일 첨부</label>
+                            <div class="c-file" data-file>
+                                <input
+                                    class="c-file__input"
+                                    type="file"
+                                    id="detectLidarFile"
+                                    accept=".las,.laz"
+                                >
+                                <div class="c-file__display">
+                                    <span class="c-file__name is-placeholder">파일첨부 (.las, .laz)</span>
+                                    <button class="c-file__clear" type="button" aria-label="파일 삭제"></button>
+                                </div>
+                                <label class="c-file__btn" for="detectLidarFile">파일 선택</label>
+                            </div>
+                        </div>
+
+                        <div class="c-check-group l-detect__checks">
+                            <label class="c-check">
+                                <input class="c-check__input" type="checkbox" checked>
+                                <span class="c-check__box" aria-hidden="true"></span>
+                                <span class="c-check__label">수목</span>
+                            </label>
+                            <label class="c-check">
+                                <input class="c-check__input" type="checkbox" checked>
+                                <span class="c-check__box" aria-hidden="true"></span>
+                                <span class="c-check__label">전신주</span>
+                            </label>
+                            <label class="c-check">
+                                <input class="c-check__input" type="checkbox">
+                                <span class="c-check__box" aria-hidden="true"></span>
+                                <span class="c-check__label">가로등</span>
+                            </label>
+                            <label class="c-check">
+                                <input class="c-check__input" type="checkbox">
+                                <span class="c-check__box" aria-hidden="true"></span>
+                                <span class="c-check__label">기타 시설물</span>
+                            </label>
+                        </div>
+
+                        <button class="c-btn c-btn--primary c-btn--40 l-detect__run" type="button" data-detect-run disabled>
+                            객체 탐지 실행
+                        </button>
+                    </div>
+
+                    <!-- 하단: 실행 전 empty -->
+                    <div class="l-detect__stage" data-detect="empty">
+                        <div class="l-detect__empty">
+                            <img class="l-detect__empty-visual" src="./img/img_ai_visual-search.png" alt="">
+                            <p class="l-detect__empty-title">LiDAR 파일을 첨부하고 객체탐지를 실행해주세요</p>
+                            <p class="l-detect__empty-desc">AI가 파일을 분석하여 수목 및 시설물 객체를 정밀하게 분석합니다.</p>
+                        </div>
+                    </div>
+
+                    <!-- 하단: 실행 후 result -->
+                    <div class="l-detect__stage" data-detect="result" hidden>
+                        
+                        <div class="l-detect__grid">
+                            <!-- 데이터 객체 탐지 화면-->
+                            <section class="l-detect__card l-detect__card--view">
+                                <div class="l-detect__title">
+                                    <h3 class="l-detect__title-text">LiDAR 데이터 객체 탐지 화면</h3>
+                                </div>
+
+                                <div class="l-detect__view">
+                                    <img class="l-detect__view-bg" src="./img/img_extreeload01.png" alt="LiDAR 객체 탐지 화면">
+
+                                    <!-- 퍼블 임시 bbox -->
+                                    <div class="l-detect__bbox l-detect__bbox--tree is-active" style="left: 17%; top: 30%; width: 19%; height: 68%;">
+                                        <span class="l-detect__bbox-label">수목</span>
+                                    </div>
+                                    <div class="l-detect__bbox l-detect__bbox--tree" style="left: 42%; top: 10%; width: 22%; height: 65%;">
+                                        <span class="l-detect__bbox-label">수목</span>
+                                    </div>
+                                    <div class="l-detect__bbox l-detect__bbox--tree" style="left: 65%; top: 5%; width: 18%; height: 47%;">
+                                        <span class="l-detect__bbox-label">수목</span>
+                                    </div>
+                                    <div class="l-detect__bbox l-detect__bbox--pole" style="left: 33%; top: 8%; width: 7%; height: 85%;">
+                                        <span class="l-detect__bbox-label">전신주</span>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- 탐지 결과 요약 -->
+                            <section class="l-detect__card l-detect__card--summary">
+                                <div class="l-detect__title">
+                                    <h3 class="l-detect__title-text">탐지 결과 요약</h3>
+                                </div>
+
+                                <div class="l-detect__summary">
+                                    <div class="l-detect__total">
+                                        <span class="l-detect__total-label">총 탐지 객체수</span>
+                                        <strong class="l-detect__total-value">10</strong>
+                                    </div>
+
+                                    <div class="l-detect__counts">
+                                        <div class="l-detect__count">
+                                            <span class="l-detect__count-label">수목</span>
+                                            <strong class="l-detect__count-value" data-type="tree">5</strong>
+                                        </div>
+                                        <div class="l-detect__count">
+                                            <span class="l-detect__count-label">전신주</span>
+                                            <strong class="l-detect__count-value" data-type="pole">1</strong>
+                                        </div>
+                                        <div class="l-detect__count">
+                                            <span class="l-detect__count-label">가로등</span>
+                                            <strong class="l-detect__count-value" data-type="lamp">3</strong>
+                                        </div>
+                                        <div class="l-detect__count">
+                                            <span class="l-detect__count-label">기타시설물</span>
+                                            <strong class="l-detect__count-value" data-type="etc">2</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="l-detect__ratio">
+                                        <h4 class="l-detect__ratio-title">객체 유형 비율</h4>
+                                        <div class="l-detect__ratio-body">
+                                            <div class="l-detect__donut">
+                                                <canvas id="chartDetectRatio" aria-label="객체 유형 비율 차트"></canvas>
+                                            </div>
+                                            <ul class="l-detect__legend">
+                                                <li class="l-detect__legend-item">
+                                                    <span class="l-detect__legend-dot" data-type="tree"></span>
+                                                    <span class="l-detect__legend-name">수목</span>
+                                                    <strong class="l-detect__legend-value">74.6%</strong>
+                                                </li>
+                                                <li class="l-detect__legend-item">
+                                                    <span class="l-detect__legend-dot" data-type="pole"></span>
+                                                    <span class="l-detect__legend-name">전신주</span>
+                                                    <strong class="l-detect__legend-value">6.3%</strong>
+                                                </li>
+                                                <li class="l-detect__legend-item">
+                                                    <span class="l-detect__legend-dot" data-type="lamp"></span>
+                                                    <span class="l-detect__legend-name">가로등</span>
+                                                    <strong class="l-detect__legend-value">11.1%</strong>
+                                                </li>
+                                                <li class="l-detect__legend-item">
+                                                    <span class="l-detect__legend-dot" data-type="etc"></span>
+                                                    <span class="l-detect__legend-name">기타시설물</span>
+                                                    <strong class="l-detect__legend-value">8.0%</strong>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- 객체탐지 결과 리스트-->
+                            <section class="l-detect__card l-detect__card--list">
+                                <div class="l-detect__title">
+                                    <h3 class="l-detect__title-text">객체 탐지 결과 리스트</h3>
+                                </div>
+
+                                <div class="l-detect__filter" role="tablist" aria-label="객체 유형 필터" data-detect-filter>
+                                    <button class="l-detect__filter-btn is-active" type="button" role="tab" aria-selected="true" data-detect-filter-btn="all">
+                                        전체
+                                        <span class="l-detect__filter-badge">10</span>
+                                    </button>
+                                    <button class="l-detect__filter-btn" type="button" role="tab" aria-selected="false" data-detect-filter-btn="tree">
+                                        수목
+                                        <span class="l-detect__filter-badge">6</span>
+                                    </button>
+                                    <button class="l-detect__filter-btn" type="button" role="tab" aria-selected="false" data-detect-filter-btn="pole">
+                                        전신주
+                                        <span class="l-detect__filter-badge">2</span>
+                                    </button>
+                                    <button class="l-detect__filter-btn" type="button" role="tab" aria-selected="false" data-detect-filter-btn="lamp">
+                                        가로등
+                                        <span class="l-detect__filter-badge">0</span>
+                                    </button>
+                                    <button class="l-detect__filter-btn" type="button" role="tab" aria-selected="false" data-detect-filter-btn="etc">
+                                        기타 시설물
+                                        <span class="l-detect__filter-badge">2</span>
+                                    </button>
+                                </div>
+
+                                <div class="l-detect__list">
+                                    <div class="l-detect__table-wrap">
+                                        <table class="l-detect__table">
+
+                                            <colgroup>
+                                                <col style="width: 10%;">
+                                                <col style="width: 15%;">
+                                                <col style="width: auto;">
+                                                <col style="width: 15%;">
+                                                <col style="width: 15%;">
+                                            </colgroup>
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">순번</th>
+                                                    <th scope="col">유형</th>
+                                                    <th scope="col">위치</th>
+                                                    <th scope="col">높이(m)</th>
+                                                    <th scope="col">수관폭(m)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody data-detect-list>
+                                                <tr class="is-active" data-detect-type="tree">
+                                                    <td>1</td>
+                                                    <td><span class="l-detect__type" data-type="tree">수목</span></td>
+                                                    <td>
+                                                        <span class="l-detect__coord">
+                                                            <span>X: 324.156</span>
+                                                            <span>Y: 215.672</span>
+                                                        </span>
+                                                    </td>
+                                                    <td>12.4</td>
+                                                    <td>8.2</td>
+                                                </tr>
+                                                <tr data-detect-type="tree">
+                                                    <td>2</td>
+                                                    <td><span class="l-detect__type" data-type="tree">수목</span></td>
+                                                    <td>
+                                                        <span class="l-detect__coord">
+                                                            <span>X: 318.042</span>
+                                                            <span>Y: 221.308</span>
+                                                        </span>
+                                                    </td>
+                                                    <td>11.8</td>
+                                                    <td>7.6</td>
+                                                </tr>
+                                                <tr data-detect-type="pole">
+                                                    <td>3</td>
+                                                    <td><span class="l-detect__type" data-type="pole">전신주</span></td>
+                                                    <td>
+                                                        <span class="l-detect__coord">
+                                                            <span>X: 330.511</span>
+                                                            <span>Y: 210.094</span>
+                                                        </span>
+                                                    </td>
+                                                    <td>9.5</td>
+                                                    <td>-</td>
+                                                </tr>
+                                                <tr data-detect-type="tree">
+                                                    <td>4</td>
+                                                    <td><span class="l-detect__type" data-type="tree">수목</span></td>
+                                                    <td>
+                                                        <span class="l-detect__coord">
+                                                            <span>X: 312.780</span>
+                                                            <span>Y: 228.451</span>
+                                                        </span>
+                                                    </td>
+                                                    <td>10.2</td>
+                                                    <td>6.9</td>
+                                                </tr>
+                                                <tr data-detect-type="etc">
+                                                    <td>5</td>
+                                                    <td><span class="l-detect__type" data-type="etc">기타 시설물</span></td>
+                                                    <td>
+                                                        <span class="l-detect__coord">
+                                                            <span>X: 341.226</span>
+                                                            <span>Y: 205.833</span>
+                                                        </span>
+                                                    </td>
+                                                    <td>3.1</td>
+                                                    <td>-</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="l-detect__pagination">
+                                    <nav class="c-paging" aria-label="객체 탐지 결과 페이지네이션" data-paging data-total="3" data-current="1"></nav>
+                                </div>
+                            </section>
+                            
+                            <!-- 객체 상세 정보 -->
+                            <section class="l-detect__card l-detect__card--detail">
+
+                                <div class="l-detect__title">
+                                    <h3 class="l-detect__title-text">객체 상세 정보</h3>
+                                </div>
+
+
+                                <div class="l-detect__photo">
+                                    <img class="l-detect__photo-img" src="./img/img_extree01.jpg" alt="객체 상세 정보 사진">
+                                </div>
+
+                                <div class="l-detect__info">
+                                    <div class="l-detect__info-row">
+                                        <div class="l-detect__info-label">수종</div>
+                                        <div class="l-detect__info-value">수목 (왕벚나무)</div>
+                                    </div>
+                                    <div class="l-detect__info-row">
+                                        <div class="l-detect__info-label">위치좌표</div>
+                                        <div class="l-detect__info-value">
+                                            <span class="l-detect__coord">
+                                                <span>X: 324.156</span>
+                                                <span>Y: 215.672</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="l-detect__info-row">
+                                        <div class="l-detect__info-label">높이 (H)</div>
+                                        <div class="l-detect__info-value">6.5 m</div>
+                                    </div>
+                                    <div class="l-detect__info-row">
+                                        <div class="l-detect__info-label">수관폭 (W)</div>
+                                        <div class="l-detect__info-value">3.5 m</div>
+                                    </div>
+                                </div>
+                            
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div id="tree-list" class="tree-list">
-          <p class="empty-message">나무 정보</p>
-        </div>
-      </section>
 
-      <section class="tree-detail-panel">
-        <div class="panel-heading">
-          <h2>나무 상세 정보</h2>
-        </div>
+        <!-- 모바일 사이드 메뉴 딤 -->
+        <div class="l-sidebar-dim" data-mobile-nav-close hidden></div>
 
-        <div id="tree-detail" class="tree-detail">
-          <p class="empty-message">나무를 선택해 주세요.</p>
-        </div>
-      </section>
-    </section>
-  </main>
-
-  <script type="module" src="./js/main.js"></script>
+     
+    </div>
 </body>
+
 </html>

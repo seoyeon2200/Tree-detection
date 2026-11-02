@@ -1,0 +1,176 @@
+
+/* ===== 공통 변수 및 속성 선언 ===== */
+
+:root {
+    /* ===== Color - Brand ===== */
+    --color-primary: #10B981;          /* 메인 컬러 */
+    --color-point: #09B7BB;            /* 서브 포인트 컬러 */
+    --color-point2: #3B82F6;           /* 서브 포인트 컬러 2 · 마커 active pin */
+    --color-point-text: #059669;       /* 포인트 텍스트 컬러 */
+
+    /* ===== Color - Text ===== */
+    --color-text: #1E293B;             /* 메인 텍스트 */
+    --color-text-sub: #475569;         /* 서브 텍스트 */
+    --color-text-label: #64748B;       /* 라벨 텍스트 */
+    --color-text-light: #9FADC2;       /* 연한 텍스트 */
+    --color-text-invert: #ffffff;
+
+    /* ===== Color - Surface / Border ===== */
+    --color-white: #ffffff;
+    --color-black: #000000;
+    --color-bg: #F8FAFC;               /* 연한 배경 */
+    --color-bg-strong: #F1F5F9;        /* 살짝 진한 배경 */
+    --color-bg-point: #ECFDF5;         /* 포인트 배경 */
+    --color-border: #E2E8F0;           /* 테두리 */
+    --color-overlay: rgba(0, 0, 0, 0.5);
+    --color-overlay-popup: rgba(15, 23, 42, 0.45);
+
+    /* ===== Color - Semantic / Status ===== */
+    --color-danger: #EC4248;           /* 간섭 예측 구간 */
+    --color-warning: #F39D2C;          /* 전정 예측 구간 */
+
+    /* ===== Map zone line ===== */
+    /* 전정 #F39D2C */
+    --map-zone-prune: #F39D2C;                            /* 코어 실선 */
+    --map-zone-prune-glow: rgba(255, 186, 90, 0.28);      /* 바깥 soft aura */
+    --map-zone-prune-band: rgba(255, 175, 80, 0.45);      /* 중간 orange 밴드 */
+    /* 간섭 #EC4248 */
+    --map-zone-interfere: #EC4248;                        /* 코어 실선 */
+    --map-zone-interfere-glow: rgba(255, 96, 104, 0.28);  /* 바깥 soft aura */
+    --map-zone-interfere-band: rgba(255, 110, 118, 0.45); /* 중간 pink 밴드 */
+    /* 공통 두께 (전정/간섭 동일) */
+    --map-zone-line-weight: 3;         /* 얇은 코어 */
+    --map-zone-band-weight: 16;        /* 중간 밴드 */
+    --map-zone-glow-weight: 32;        /* 넓은 soft aura */
+
+    /* ===== Gradient ===== */
+    --gradient-main: linear-gradient(90deg, #10B981 0%, #09B7BB 100%);   /* 메인 그라데이션 */
+    --gradient-button: linear-gradient(90deg, #10B981 0%, #3B82F6 100%); /* 버튼 그라데이션 */
+
+    /* ===== Color - 수종별 (Tree Species) ===== */
+    --color-tree-cherry: #F6BCD6;      /* 왕벚나무 */
+    --color-tree-fringe: #68CAF6;      /* 이팝나무 */
+    --color-tree-zelkova: #75E49C;     /* 느티나무 */
+    --color-tree-ginkgo: #F9CA63;      /* 은행나무 */
+    --color-tree-plane: #FF0776;       /* 버즘나무 */
+    --color-tree-tulip: #FFF9B3;       /* 목백합나무 */
+
+    /* ===== Color - 작업구간명 라인 (11개소) ===== */
+    --map-section-01: #E53935;  /* 1. 용전네거리-중리네거리 */
+    --map-section-02: #FB8C00;  /* 2. 성남네거리-용전네거리 */
+    --map-section-03: #FDD835;  /* 3. 동서교-성남네거리 */
+    --map-section-04: #43A047;  /* 4. 대동오거리-동서교 */
+    --map-section-05: #00897B;  /* 5. 중리네거리-송촌네거리 (퍼블 임시) */
+    --map-section-06: #1E88E5;  /* 6. 송촌네거리-비래네거리 (퍼블 임시) */
+    --map-section-07: #5E35B1;  /* 7. 비래네거리-법동네거리 (퍼블 임시) */
+    --map-section-08: #D81B60;  /* 8. 가양오거리-대동오거리 (퍼블 임시) */
+    --map-section-09: #6D4C41;  /* 9. 판암네거리-가양오거리 (퍼블 임시) */
+    --map-section-10: #00ACC1;  /* 10. 용운동네거리-판암네거리 (퍼블 임시) */
+    --map-section-11: #7CB342;  /* 11. 자양네거리-용운동네거리 (퍼블 임시) */
+    --map-section-line-weight: 5; /* 구간명 실선 두께(px) */
+
+    /* ===== Map cluster (줌아웃 수목 묶음) ===== */
+    --map-cluster-bg: var(--color-primary);              /* 일반 #10B981 */
+    --map-cluster-bg-mid: #059669;
+    --map-cluster-bg-lg: #047857;
+    --map-cluster-prune: var(--color-warning);           /* 전정 #F39D2C */
+    --map-cluster-interfere: var(--color-danger);        /* 간섭 #EC4248 */
+    --map-cluster-text: #ffffff;
+    --map-cluster-ring: rgba(16, 185, 129, 0.28);
+    --map-cluster-ring-prune: rgba(243, 157, 44, 0.32);
+    --map-cluster-ring-interfere: rgba(236, 66, 72, 0.32);
+    --map-cluster-ring-mixed: rgba(236, 100, 72, 0.3);
+    --map-cluster-size-sm: 3.6rem;   /* 2~9 */
+    --map-cluster-size-md: 4.6rem;   /* 10~49 */
+    --map-cluster-size-lg: 5.6rem;   /* 50+ */
+
+    /* ===== Typography ===== */
+    --font-family-base: "Pretendard", "Noto Sans KR", system-ui, sans-serif;   /* 기본/본문 */
+    --font-family-point: "Paperlogy", "Pretendard", sans-serif;                /* 포인트/제목 */
+    --font-family-num: "Roboto", system-ui, sans-serif;
+
+    --font-size-xxs: 1.2rem;
+    --font-size-xs: 1.3rem;
+    --font-size-sm: 1.4rem;
+    --font-size-base: 1.6rem;
+    --font-size-lg: 1.8rem;
+    --font-size-xl: 2.0rem;
+    --font-size-2xl: 2.4rem;
+    --font-size-3xl: 3.2rem;
+    --font-size-4xl: 4.0rem;
+    --font-size-6xl: 6.0rem;
+
+    --font-weight-light: 300;
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    --line-height-tight: 1.2;
+    --line-height-base: 1.5;
+    --line-height-loose: 1.8;
+
+    /* ===== Spacing ===== */
+    --spacing-xs: 0.4rem;   /* 4px */
+    --spacing-sm: 0.8rem;   /* 8px */
+    --spacing-md: 1.6rem;   /* 16px */
+    --spacing-20: 2rem;     /* 20px */
+    --spacing-lg: 2.4rem;   /* 24px */
+    --spacing-xl: 3.2rem;   /* 32px */
+    --spacing-2xl: 4.8rem;  /* 48px */
+    --spacing-3xl: 6.4rem;  /* 64px */
+
+    /* ===== Border Radius ===== */
+    --radius-xs: 0.4rem;
+    --radius-sm: 0.6rem;
+    --radius-md: 0.8rem;
+    --radius-lg: 1.0rem;
+    --radius-xl: 1.2rem;
+    --radius-2xl: 1.6rem;
+    --radius-full: 9999px;
+
+    /* ===== Shadow ===== */
+    --shadow-left-nav: 2px 0px 16px rgba(0, 0, 0, 0.05);
+    --shadow-top-nav: 0px 2px 10px rgba(15, 23, 42, 0.02);
+    --shadow-left-pannel: 4px 0px 24px rgba(15, 23, 42, 0.08);
+    --shadow-right-pannel: -10px 0px 40px rgba(15, 23, 42, 0.1);
+    --shadow-main-float: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-content-float: 0 2px 12px rgba(15, 23, 42, 0.02);
+    --shadow-button: 0 4px 12px rgba(16, 185, 129, 0.2);
+    --shadow-card: 0px 1px 3px rgba(15, 23, 42, 0.08), 0px 1px 2px rgba(15, 23, 42, 0.04);
+    --shadow-popup: 0px 20px 40px rgba(0, 0, 0, 0.12);
+    --shadow-dropdown: 0px 10px 25px rgba(15, 23, 42, 0.1);
+    --shadow-input: 0px 0px 5.9px rgba(230, 249, 245, 1);
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.1);
+    --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.12);
+
+
+    /* ===== Layout ===== */
+    --header-height: 7.6rem;
+    --sidebar-width: 28rem;
+    --sidebar-width-collapsed: 8rem; /* 80px */
+    --panel-width: 40rem; /* 우측 사이드 패널 */
+    --sidemenu-height: 7rem; /* ≤1000px 하단 탭바 높이 */
+    --treepanel-width: 36rem; /* 좌측 수목정보 패널 (홈 지도 오버레이) */
+    --treepanel-collapsed-height: 22vh; /* ≤1000px 수목정보 시트 1단 */
+    --treepanel-peek-height: 52vh; /* ≤1000px 수목정보 시트 2단 */
+    --treepanel-expanded-height: calc(100vh - var(--sidemenu-height) - 6rem); /* ≤1000px 3단 */
+    --treelist-width: 30rem; /* 서브: 수목 리스트 패널 */
+    --container-max: 128rem;
+
+    /* ===== Z-index ===== */
+    --z-base: 1;
+    --z-dropdown: 100;
+    --z-header: 600;
+    --z-sidebar: 500;
+    --z-overlay: 900;
+    --z-modal: 1000;
+    --z-toast: 1100;
+
+    /* ===== Transition ===== */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.25s ease;
+    --transition-slow: 0.4s ease;
+}

@@ -1,4 +1,3 @@
-
 * {
   box-sizing: border-box;
 }
@@ -320,3 +319,53 @@ body {
   font-weight: 700;
 }
 
+.top-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.tree-count-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 24px;
+  min-width: 0;
+  min-height: 0;
+  background: #10151f;
+  color: #edf2f7;
+  border-left: 1px solid #344054;
+}
+
+.tree-count-panel h2 {
+  font-size: 15px;
+  font-weight: bold;
+  margin: 0 0 24px;
+  color: #edf2f7;
+}
+
+.count-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  width: 100%;
+  padding: 24px 30px;
+
+  background: #263449;
+  border: 1px solid #3a4c63;
+  border-radius: 12px;
+}
+
+.count-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #edf2f7;
+}
+
+#detected-tree-count {
+  font-size: 15px;
+  font-weight: bold;
+  color: #edf2f7;
+}

@@ -1,258 +1,493 @@
-import * as THREE from "three";
+/* main.js — HOME / 지도 영역 */
 
-import {scene,camera,controls,resizeViewer} from "./scene.js";
-import { fetchLAS, fetchTrees } from "./api.js";
-import { parseLAS } from "./lasParser.js";
-import { createPointCloud } from "./pointCloud.js";
-import { createTreeBoxes } from "./treeBoxes.js";
+(function () {
+    "use strict";
 
-const status = document.getElementById("status");
-const treeList = document.getElementById("tree-list");
-const treeCount = document.getElementById("tree-count");
-const treeDetail = document.getElementById("tree-detail");
-
-let trees = [];
-let selectedTreeId = null;
-let treeBoxController = null;
-
-// JSON 필드명과 화면에 표시할 한글 이름
-const FIELD_LABELS = {
-  treeId: "수목 아이디",
-  label: "라벨",
-  speciesCode: "수종 코드",
-  emdCd: "법정동 코드",
-  sido: "시도",
-  sigungu: "시군구",
-  eupmyeondong: "읍면동",
-  sectionId: "실증구간 아이디",
-  side: "식재 방향(1:좌측, 2:우측)",
-  easting: "동측 좌표(X)",
-  northing: "북측 좌표(Y)",
-  elevationM: "표고(m)",
-  crsEpsg: "좌표계 EPSG 코드",
-  treeHeightM: "수고(m)",
-  dbhCm: "흉고직경(cm)",
-  crownWidthM: "평균 수관폭(m)",
-  crownWidthSnM: "남북 수관폭(m)",
-  crownWidthEwM: "동서 수관폭(m)",
-  crownAreaM2: "수관 면적(m²)"
-};
-
-function displayValue(value) {
-  if (
-    value === null ||
-    value === undefined ||
-    value === ""
-  ) {
-    return "-";
-  }
-
-  return String(value);
-}
-
-function renderTreeList() {
-  treeList.replaceChildren();
-
-  // 전체 나무 개수 표시
-  treeCount.textContent = `${trees.length.toLocaleString()}개`;
-
-  if (trees.length === 0) {
-    const message = document.createElement("p");
-    message.className = "empty-message";
-    message.textContent = "나무 정보가 없습니다.";
-    treeList.appendChild(message);
-    return;
-  }
-
-  const fragment = document.createDocumentFragment();
-
-  // 검색 필터 없이 전체 나무 목록 표시
-  trees.forEach((tree) => {
-    const treeId = String(tree.treeId ?? "");
-    const button = document.createElement("button");
-
-    button.type = "button";
-    button.className = "tree-item";
-
-    if (treeId === selectedTreeId) {
-      button.classList.add("selected");
-      button.setAttribute("aria-pressed", "true");
-    } else {
-      button.setAttribute("aria-pressed", "false");
+    function getFilter() {
+        return document.querySelector(".c-mapfilter");
     }
 
-    const label = document.createElement("span");
-    label.className = "tree-item-label";
-    label.textContent = displayValue(tree.label);
+    function updateBadge(filter) {
+        if (!filter) return;
 
-    const meta = document.createElement("span");
-    meta.className = "tree-item-meta";
-    meta.textContent =
-      `ID: ${displayValue(tree.treeId)} · ` +
-      `수종: ${displayValue(tree.speciesCode)}`;
+        var switchesOn = filter.querySelectorAll("[data-mapfilter-switch]:checked").length;
+        var chipsOn = filter.querySelectorAll("[data-mapfilter-chip].is-active").length;
+        /* 스위치 수 + (수목 종류 선택 여부 1) */
+        var count = switchesOn + (chipsOn > 0 ? 1 : 0);
 
-    button.append(label, meta);
+        var badge = filter.querySelector(".c-mapfilter__badge");
+        if (badge) badge.textContent = String(count);
+    }
 
-    button.addEventListener("click", () => {
-      selectTree(tree);
+    function resetFilter(filter) {
+        filter.querySelectorAll("[data-mapfilter-switch]").forEach(function (input) {
+            input.checked = true;
+        });
+
+        filter.querySelectorAll("[data-mapfilter-chip]").forEach(function (chip) {
+            var tree = chip.getAttribute("data-tree");
+            var defaultOn = tree === "cherry" || tree === "fringe" || tree === "zelkova" || tree === "ginkgo";
+            chip.classList.toggle("is-active", defaultOn);
+        });
+
+        updateBadge(filter);
+        syncMapviz(filter);
+    }
+
+    /* 퍼블 목업: 필터 ↔ 지도 시각화 오버레이 */
+    function isLayerOn(filter, layer) {
+        var input = filter.querySelector('[data-mapfilter-layer="' + layer + '"]');
+        return !input || input.checked;
+    }
+
+    function syncMapviz(filter) {
+        var mapviz = document.querySelector("[data-mapviz]");
+        if (!mapviz || !filter) return;
+
+        var pruneOn = isLayerOn(filter, "prune");
+        var interfereOn = isLayerOn(filter, "interfere");
+        var upOn = isLayerOn(filter, "up");
+        var downOn = isLayerOn(filter, "down");
+        var labelOn = isLayerOn(filter, "label");
+
+        mapviz.classList.toggle("is-hide-label", !labelOn);
+
+        mapviz.querySelectorAll('[data-mapviz-layer="prune"]').forEach(function (el) {
+            el.hidden = !pruneOn;
+        });
+        mapviz.querySelectorAll('[data-mapviz-layer="interfere"]').forEach(function (el) {
+            el.hidden = !interfereOn;
+        });
+
+        var activeTrees = {};
+        filter.querySelectorAll("[data-mapfilter-chip].is-active").forEach(function (chip) {
+            var tree = chip.getAttribute("data-tree");
+            if (tree) activeTrees[tree] = true;
+        });
+
+        mapviz.querySelectorAll(".c-mapviz__marker").forEach(function (marker) {
+            var tree = marker.getAttribute("data-tree");
+            var dir = marker.getAttribute("data-mapviz-dir");
+            var dirOk = (dir === "up" && upOn) || (dir === "down" && downOn) || !dir;
+            var treeOk = !!(tree && activeTrees[tree]);
+            marker.hidden = !(dirOk && treeOk);
+        });
+    }
+
+    /* ----- Chart.js ----- */
+    var speciesChart = null;
+    var reportSpeciesChart = null;
+    var reportRiskChart = null;
+
+    // 예측 데이터 퍼블리싱 고정값
+    var REPORT_RISK_PERIOD_DATA = {
+        "1": {
+            total: 490,
+            chart: [75, 19, 396],
+            legend: { clear: 75, warning: 19, critical: 396 },
+            summary: { changed: 11, newDanger: 9, confidence: "91.7" }
+        },
+        "2": {
+            total: 490,
+            chart: [58, 32, 400],
+            legend: { clear: 58, warning: 32, critical: 400 },
+            summary: { changed: 18, newDanger: 14, confidence: "88.5" }
+        },
+        "3": {
+            total: 490,
+            chart: [42, 38, 410],
+            legend: { clear: 42, warning: 38, critical: 410 },
+            summary: { changed: 26, newDanger: 22, confidence: "84.2" }
+        }
+    };
+
+    var REPORT_RISK_CHART_COLORS = ["#52C460", "#F5B42D", "#DC1B27"];
+
+    function initSpeciesChart() {
+        var canvas = document.getElementById("chartSpeciesTop5");
+        if (!canvas || typeof Chart === "undefined") return;
+
+        if (speciesChart) {
+            speciesChart.destroy();
+            speciesChart = null;
+        }
+
+        var labels = ["은행나무", "벚나무", "플라타너스", "느티나무", "이팝나무"];
+        var values = [8200, 5000, 3100, 1500, 800];
+        var colors = [
+            "#27B983",
+            "#42D39B",
+            "#75E7B9",
+            "#AAF3D1",
+            "#D2FAE6"
+        ];
+
+        speciesChart = new Chart(canvas, {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: colors,
+                    borderWidth: 0,
+                    borderRadius: 999,
+                    borderSkipped: false,
+                    barThickness: 15,
+                    categoryPercentage: 0.7,
+                    barPercentage: 0.85
+                }]
+            },
+            options: {
+                indexAxis: "y",
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function (ctx) {
+                                return ctx.parsed.x.toLocaleString("ko-KR") + " 그루";
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        min: 0,
+                        max: 10000,
+                        grid: {
+                            color: "#E2E8F0",
+                            drawBorder: false,
+                            tickLength: 0
+                        },
+                        border: { display: false },
+                        ticks: {
+                            stepSize: 2000,
+                            color: "#9FADC2",
+                            font: {
+                                family: "Pretendard, sans-serif",
+                                size: 11
+                            },
+                            callback: function (value) {
+                                if (value === 0) return "0";
+                                return value / 1000 + "k";
+                            }
+                        }
+                    },
+                    y: {
+                        grid: { display: false, drawBorder: false },
+                        border: { display: false },
+                        ticks: {
+                            color: "#475569",
+                            font: {
+                                family: "Pretendard, sans-serif",
+                                size: 12,
+                                weight: "500"
+                            },
+                            padding: 8
+                        }
+                    }
+                },
+                layout: {
+                    padding: { top: 4, right: 8, bottom: 0, left: 0 }
+                }
+            }
+        });
+    }
+
+    function createDonutChart(canvas, data, colors, labels) {
+        return new Chart(canvas, {
+            type: "doughnut",
+            data: {
+                labels: labels || [],
+                datasets: [{
+                    data: data,
+                    backgroundColor: colors,
+                    borderWidth: 0,
+                    hoverOffset: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: "68%",
+                animation: false,
+                animations: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function (ctx) {
+                                var name = ctx.label ? ctx.label + ": " : "";
+                                return name + ctx.parsed.toLocaleString("ko-KR");
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 차트 1회 생성 (기본: 1년후)
+    function initReportCharts() {
+        if (typeof Chart === "undefined") return;
+
+        var speciesCanvas = document.getElementById("chartReportSpecies");
+        var riskCanvas = document.getElementById("chartReportRisk");
+
+        if (reportSpeciesChart) {
+            reportSpeciesChart.destroy();
+            reportSpeciesChart = null;
+        }
+        if (reportRiskChart) {
+            reportRiskChart.destroy();
+            reportRiskChart = null;
+        }
+
+        if (speciesCanvas) {
+            reportSpeciesChart = createDonutChart(
+                speciesCanvas,
+                [100, 70, 40, 25, 15, 4],
+                ["#F6BCD6", "#68CAF6", "#75E49C", "#F9CA63", "#FF0776", "#FFF9B3"],
+                ["왕벚나무", "이팝나무", "느티나무", "은행나무", "버즘나무", "목백합나무"]
+            );
+        }
+
+        if (riskCanvas) {
+            reportRiskChart = createDonutChart(
+                riskCanvas,
+                REPORT_RISK_PERIOD_DATA["1"].chart,
+                REPORT_RISK_CHART_COLORS
+            );
+        }
+    }
+
+    // 탭 클릭 시 데이터 업데이트
+    function setReportRiskPeriod(period) {
+        var data = REPORT_RISK_PERIOD_DATA[period];
+        var card = document.querySelector("[data-report-risk]");
+        if (!data || !card) return;
+
+        card.querySelectorAll("[data-report-period-btn]").forEach(function (btn) {
+            var on = btn.getAttribute("data-report-period-btn") === period;
+            btn.classList.toggle("is-active", on);
+            btn.setAttribute("aria-selected", on ? "true" : "false");
+        });
+
+        var totalEl = card.querySelector("[data-report-risk-total]");
+        if (totalEl) totalEl.textContent = String(data.total);
+
+        card.querySelectorAll("[data-report-risk-legend-count]").forEach(function (el) {
+            var key = el.getAttribute("data-report-risk-legend-count");
+            if (key && data.legend[key] != null) {
+                el.textContent = String(data.legend[key]);
+            }
+        });
+
+        var changedEl = card.querySelector("[data-report-risk-summary-changed]");
+        var newDangerEl = card.querySelector("[data-report-risk-summary-new-danger]");
+        var confidenceEl = card.querySelector("[data-report-risk-summary-confidence]");
+        if (changedEl) changedEl.textContent = String(data.summary.changed);
+        if (newDangerEl) newDangerEl.textContent = String(data.summary.newDanger);
+        if (confidenceEl) {
+            confidenceEl.innerHTML = data.summary.confidence + "<strong>%</strong>";
+        }
+
+        if (reportRiskChart) {
+            reportRiskChart.data.datasets[0].data = data.chart.slice();
+            reportRiskChart.update("none");
+        }
+    }
+
+    // 탭 클릭 이벤트
+    function initReportRiskPeriodTabs() {
+        var tabList = document.querySelector("[data-report-period]");
+        if (!tabList) return;
+
+        tabList.querySelectorAll("[data-report-period-btn]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                var period = btn.getAttribute("data-report-period-btn");
+                if (!period || btn.classList.contains("is-active")) return;
+                setReportRiskPeriod(period);
+            });
+        });
+    }
+
+    function resizeCharts() {
+        if (speciesChart) speciesChart.resize();
+        if (reportSpeciesChart) reportSpeciesChart.resize();
+        if (reportRiskChart) reportRiskChart.resize();
+    }
+
+    function setMapfilterDimOpen(open) {
+        var dim = document.querySelector(".c-mapfilter-dim");
+        if (!dim) return;
+
+        if (open) dim.removeAttribute("hidden");
+        else dim.setAttribute("hidden", "");
+    }
+
+    function setMapfilterOpen(filter, open) {
+        if (!filter) return;
+
+        filter.classList.toggle("is-open", open);
+        var toggle = filter.querySelector("[data-mapfilter-toggle]");
+        if (toggle) toggle.setAttribute("aria-expanded", open ? "true" : "false");
+        setMapfilterDimOpen(open);
+    }
+
+    document.addEventListener("click", function (e) {
+        if (e.target.closest("[data-mapfilter-close]")) {
+            setMapfilterOpen(getFilter(), false);
+            return;
+        }
+
+        var toggle = e.target.closest("[data-mapfilter-toggle]");
+        if (toggle) {
+            var filter = toggle.closest(".c-mapfilter");
+            if (!filter) return;
+
+            setMapfilterOpen(filter, !filter.classList.contains("is-open"));
+            return;
+        }
+
+        var reset = e.target.closest("[data-mapfilter-reset]");
+        if (reset) {
+            var filterReset = reset.closest(".c-mapfilter");
+            if (filterReset) resetFilter(filterReset);
+            return;
+        }
+
+        var chip = e.target.closest("[data-mapfilter-chip]");
+        if (chip) {
+            var filterChip = chip.closest(".c-mapfilter");
+            chip.classList.toggle("is-active");
+            updateBadge(filterChip);
+            syncMapviz(filterChip);
+        }
     });
-    fragment.appendChild(button);
-  });
 
-  treeList.appendChild(fragment);
+    document.addEventListener("change", function (e) {
+        if (!e.target.matches("[data-mapfilter-switch]")) return;
+        var filterChange = e.target.closest(".c-mapfilter");
+        updateBadge(filterChange);
+        syncMapviz(filterChange);
+    });
 
-  console.log("BOTTOM 목록 생성 완료");
-  console.log(
-    "실제 목록 항목 개수:",
-    treeList.querySelectorAll(".tree-item").length
-  );
-}
+    /* ----- 수목정보 패널 사진 슬라이드 ----- */
+    var treepanelPhotoSwiper = null;
 
-function renderTreeDetail(tree) {
-  treeDetail.replaceChildren();
-
-  if (!tree) {
-    const message = document.createElement("p");
-    message.className = "empty-message";
-    message.textContent = "선택된 나무가 없습니다.";
-    treeDetail.appendChild(message);
-    return;
-  }
-
-  const table = document.createElement("table");
-  const tbody = document.createElement("tbody");
-
-  Object.entries(FIELD_LABELS).forEach(([field, label]) => {
-    const row = document.createElement("tr");
-    const heading = document.createElement("th");
-    const value = document.createElement("td");
-
-    heading.scope = "row";
-    heading.textContent = label;
-    value.textContent = displayValue(tree[field]);
-
-    row.append(heading, value);
-    tbody.appendChild(row);
-  });
-
-  table.appendChild(tbody);
-  treeDetail.appendChild(table);
-}
-
-function selectTree(tree) {
-  if (!tree) return;
-
-  // 선택한 나무 ID 저장
-  selectedTreeId = String(tree.treeId ?? "");
-
-  // 왼쪽 목록에서 선택한 카드 강조
-  renderTreeList();
-  
-  // 선택된 나무가 목록의 가운데로 오도록 스크롤
-  const selectedItem = treeList.querySelector(".tree-item.selected");
-
-  if (selectedItem) {
-    treeList.scrollTo({
-	  top:
-	    treeList.scrollTop +
-	    selectedItem.getBoundingClientRect().top -
-	    treeList.getBoundingClientRect().top -
-	    treeList.clientTop -
-	    treeList.clientHeight / 2 +
-	    selectedItem.offsetHeight / 2,
-	  behavior: "instant"
-	});
-  }
-  // 오른쪽에 선택한 나무의 상세 정보 표시
-  renderTreeDetail(tree);
-  
-  // 선택한 3D 상자를 빨간색으로 변경
-  const result = treeBoxController?.selectTree(tree);
-  
-  status.textContent =
-    `선택한 나무: ${displayValue(tree.label)} ` +
-    `(${selectedTreeId})`;
-    
-  return result;
-}
-
-async function loadViewer() {
-  try {
-    status.textContent = "LAS 점군을 불러오는 중...";
-
-    const buffer = await fetchLAS();
-    const data = parseLAS(buffer);
-    
-    console.log("LAS 파일 로딩 성공:", buffer.byteLength, "bytes");
-	console.log("LAS 점 개수:", data.positions.length / 3);
-
-    if (!data.positions || data.positions.length === 0) {
-      throw new Error("LAS 점군 데이터가 비어 있습니다.");
+    function padSlideNum(n) {
+        return String(n).padStart(2, "0");
     }
 
-    status.textContent = "나무 JSON을 불러오는 중...";
+    function updateTreepanelPhotoCount(swiper) {
+        if (!swiper || !swiper.el) return;
 
-    trees = await fetchTrees();
-    
-    // 데이터를 받으면 바로 목록 표시
-	selectedTreeId = null;
-	renderTreeList();
-	
-	// 최초에는 상세 정보 비우기
-	treeDetail.replaceChildren();
-	    
-    console.log("나무 JSON 로딩 성공");
-	console.log("전체 나무 개수:", trees.length);
-	console.log("첫 번째 나무 데이터:", trees[0]);
+        var countEl = swiper.el.querySelector(".l-treepanel__photo-count");
+        if (!countEl) return;
 
-    // 점군 중심을 기준 원점으로 변환
-    const pointCloudResult = createPointCloud(data);
+        var current = (swiper.realIndex || 0) + 1;
+        var total = swiper.slides ? swiper.slides.length : 0;
+        countEl.innerHTML =
+            '<span class="l-treepanel__photo-count-current">' +
+            padSlideNum(current) +
+            "</span> / " +
+            padSlideNum(total);
+    }
 
-    // 같은 원점을 사용해 나무 상자를 배치
-	treeBoxController = createTreeBoxes(
-	  trees,
-	  pointCloudResult.origin
-	);
-	
-	// 3D 상자를 클릭하면 main.js의 selectTree() 호출
-	const canvas = document.querySelector("#viewer canvas");
-	
-	if (!canvas) {
-	  throw new Error("3D 화면의 canvas를 찾을 수 없습니다.");
-	}
-	treeBoxController.bindPointerEvents(
-	  canvas,
-	  camera,
-	  (tree) => selectTree(tree)
-	);
-	
-    // 초기 카메라를 점군 중심으로 설정
-    const center = pointCloudResult.center;
-    const distance = Math.max(
-      pointCloudResult.radius * 2.5,
-      1
-    );
+    function initTreepanelPhotoSwiper() {
+        var el = document.querySelector(".l-treepanel__photo.swiper");
+        if (!el || typeof Swiper === "undefined") return;
 
-    controls.target.copy(center);
+        if (treepanelPhotoSwiper) {
+            treepanelPhotoSwiper.destroy(true, true);
+            treepanelPhotoSwiper = null;
+        }
 
-    camera.position.set(
-      center.x + distance,
-      center.y - distance,
-      center.z + distance
-    );
+        treepanelPhotoSwiper = new Swiper(el, {
+            slidesPerView: 1,
+            spaceBetween: 0,
+            speed: 300,
+            loop: false,
+            observer: true,
+            observeParents: true,
+            navigation: {
+                nextEl: el.querySelector(".l-treepanel__photo-nav-next"),
+                prevEl: el.querySelector(".l-treepanel__photo-nav-prev")
+            },
+            on: {
+                init: function (swiper) {
+                    updateTreepanelPhotoCount(swiper);
+                },
+                slideChange: function (swiper) {
+                    updateTreepanelPhotoCount(swiper);
+                }
+            }
+        });
+    }
 
-    camera.lookAt(center);
-    controls.update();
-    resizeViewer();
-	
-	status.textContent =
-      `표시 완료 | 점군 ${pointCloudResult.pointCount.toLocaleString()}개 | ` +
-      `나무 상자 ${treeBoxController.created}/${treeBoxController.total}개 | ` +
-      `제외 ${treeBoxController.skipped}개`;
-  	} catch (error) {
-    console.error(error);
-    status.textContent = `오류: ${error.message}`;
-  }
-}
+    updateBadge(getFilter());
+    syncMapviz(getFilter());
+    initSpeciesChart();
+    initReportCharts();
+    initReportRiskPeriodTabs();
+    initTreepanelPhotoSwiper();
 
-loadViewer();
+    /* Escape → 지도 필터 바텀 시트 닫기 */
+    document.addEventListener("keydown", function (e) {
+        if (e.key !== "Escape") return;
+        var filter = getFilter();
+        if (filter && filter.classList.contains("is-open")) {
+            setMapfilterOpen(filter, false);
+        }
+    });
+
+    /* 퍼블: 마커 클릭 → active + 수목정보 패널 (모바일: 2단부터) */
+    function setTreepanelOpen(open) {
+        if (window.LTreePanel && typeof window.LTreePanel.setSheet === "function") {
+            window.LTreePanel.setSheet(open ? "level2" : "closed");
+            if (open && treepanelPhotoSwiper) {
+                window.setTimeout(function () {
+                    treepanelPhotoSwiper.update();
+                }, 280);
+            }
+            return;
+        }
+
+        var app = document.querySelector(".l-app");
+        var panel = document.getElementById("lTreepanel");
+        if (!app || !panel) return;
+
+        app.classList.toggle("is-treepanel-open", open);
+        app.classList.toggle("is-treepanel-sheet-2", open);
+        app.classList.remove("is-treepanel-sheet-1", "is-treepanel-sheet-3", "is-treepanel-expanded");
+        panel.setAttribute("aria-hidden", open ? "false" : "true");
+
+        if (open && treepanelPhotoSwiper) {
+            window.setTimeout(function () {
+                treepanelPhotoSwiper.update();
+            }, 280);
+        }
+    }
+
+    document.addEventListener("click", function (e) {
+        var marker = e.target.closest(".c-mapviz__marker");
+        if (!marker) return;
+
+        var mapviz = marker.closest("[data-mapviz]") || marker.closest(".c-mapviz");
+        var scope = mapviz || document;
+        scope.querySelectorAll(".c-mapviz__marker.is-active").forEach(function (el) {
+            if (el !== marker) el.classList.remove("is-active");
+        });
+        marker.classList.toggle("is-active");
+
+        setTreepanelOpen(marker.classList.contains("is-active"));
+    });
+
+    /* 우측 패널 열릴 때 차트 리사이즈 */
+    document.addEventListener("click", function (e) {
+        if (!e.target.closest("[data-sidemenu]")) return;
+        window.setTimeout(resizeCharts, 280);
+    });
+})();

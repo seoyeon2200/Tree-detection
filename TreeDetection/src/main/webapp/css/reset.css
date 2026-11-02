@@ -1,0 +1,187 @@
+/* ===== 폰트 설정 - Pretendard (기본/본문) ===== */
+
+@font-face {
+    font-family: "Pretendard";
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+    src: url("../font/Pretendard/Pretendard-Thin.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Pretendard";
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+    src: url("../font/Pretendard/Pretendard-ExtraLight.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Pretendard";
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+    src: url("../font/Pretendard/Pretendard-Light.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Pretendard";
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    src: url("../font/Pretendard/Pretendard-Regular.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Pretendard";
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+    src: url("../font/Pretendard/Pretendard-Medium.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Pretendard";
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+    src: url("../font/Pretendard/Pretendard-SemiBold.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Pretendard";
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+    src: url("../font/Pretendard/Pretendard-Bold.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Pretendard";
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+    src: url("../font/Pretendard/Pretendard-ExtraBold.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Pretendard";
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+    src: url("../font/Pretendard/Pretendard-Black.woff2") format("woff2");
+}
+
+
+
+
+/* ===== 폰트 설정 - Paperlogy (포인트/제목) ===== */
+
+@font-face {
+    font-family: "Paperlogy";
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+    src: url("../font/Paperlogy/Paperlogy-1Thin.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Paperlogy";
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+    src: url("../font/Paperlogy/Paperlogy-2ExtraLight.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Paperlogy";
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+    src: url("../font/Paperlogy/Paperlogy-3Light.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Paperlogy";
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    src: url("../font/Paperlogy/Paperlogy-4Regular.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Paperlogy";
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+    src: url("../font/Paperlogy/Paperlogy-5Medium.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Paperlogy";
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+    src: url("../font/Paperlogy/Paperlogy-6SemiBold.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Paperlogy";
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+    src: url("../font/Paperlogy/Paperlogy-7Bold.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Paperlogy";
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+    src: url("../font/Paperlogy/Paperlogy-8ExtraBold.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Paperlogy";
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+    src: url("../font/Paperlogy/Paperlogy-9Black.woff2") format("woff2");
+}
+
+
+
+
+/* ===== 리셋 ===== */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  html {
+    /* 1rem = 10px 기준 */
+    font-size: 62.5%;
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+  }
+  
+  body {
+    min-height: 100vh;
+    font-family: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #1E293B;
+    letter-spacing: -0.02em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  img, picture, video, canvas, svg {
+    display: block;
+    max-width: 100%;
+  }
+  
+  input, button, textarea, select {
+    font: inherit;
+  }
+  
+  p, h1, h2, h3, h4, h5, h6 {
+    overflow-wrap: break-word;
+  }
+  
+  #root, #__next {
+    isolation: isolate;
+  }
+
+  a, i {
+  text-decoration: none;
+  color: inherit;
+  font-style: normal;
+}

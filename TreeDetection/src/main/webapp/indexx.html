@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>수목 객체 탐지</title>
+  <link rel="stylesheet" href="./css/reset.css">
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/layout.css">
+  <link rel="stylesheet" href="./css/component.css">
+  <link rel="stylesheet" href="./css/viewer.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <header class="header">
+    <h1>Las Viewer</h1>
+    <div id="status" role="status">데이터를 불러오는 중...</div>
+  </header>
+
+  <main class="app-layout">
+    <section class="top-panel">
+      <section id="viewer"
+               aria-label="3D 수목 시각화">
+      </section>
+      <section class="tree-count-panel">
+		  <h2>탐지 결과 요약</h2>
+		
+		  <div class="count-card">
+		    <span class="count-label">총 탐지 개체수</span>
+		    <span id="detected-tree-count">0</span>
+		  </div>
+	  </section>
+    </section>
+
+    <section class="bottom-panel">
+      <section class="tree-list-panel">
+        <div class="panel-heading">
+          <h2>나무 목록</h2>
+          <span id="tree-count">0개</span>
+        </div>
+
+        <div id="tree-list" class="tree-list">
+          <p class="empty-message">나무 정보</p>
+        </div>
+      </section>
+
+      <section class="tree-detail-panel">
+        <div class="panel-heading">
+          <h2>나무 상세 정보</h2>
+        </div>
+
+        <div id="tree-detail" class="tree-detail">
+          <p class="empty-message">나무를 선택해 주세요.</p>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>

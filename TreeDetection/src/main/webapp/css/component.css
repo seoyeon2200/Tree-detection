@@ -1,0 +1,1095 @@
+/* ===== Field (label + input 묶음) ===== */
+.c-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.c-field__label {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-main);
+}
+
+/* ===== Input ===== */
+.c-input {
+    width: 100%;
+    height: 4.4rem;
+    padding: 0 1.6rem;
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    outline: none;
+    transition:
+        border-color var(--transition-fast),
+        background-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.c-input::placeholder {
+    color: var(--color-text-light);
+}
+
+.c-input:hover {
+    border-color: #cbd5e1;
+}
+
+.c-input:focus {
+    background-color: var(--color-white);
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-input);
+}
+
+.c-input:disabled {
+    color: var(--color-text-light);
+    cursor: not-allowed;
+    background-color: var(--color-bg-strong);
+    opacity: 0.7;
+}
+
+.c-input--error {
+    border-color: var(--color-danger);
+}
+
+.c-input--error:focus {
+    border-color: var(--color-danger);
+    box-shadow: 0 0 0 3px rgba(236, 66, 72, 0.12);
+}
+
+/* 크기 (Input) */
+.c-input--44 {
+    height: 4.4rem; /* 44px */
+    font-size: var(--font-size-sm);
+}
+
+.c-input--42 {
+    height: 4.2rem; /* 42px */
+    font-size: var(--font-size-base);
+}
+
+.c-input--40 {
+    height: 4rem; /* 40px */
+    padding: 0 1.4rem;
+    font-size: var(--font-size-sm);
+}
+
+.c-input--27 {
+    height: 2.7rem; /* 27px */
+    padding: 0 1rem;
+    font-size: var(--font-size-xxs);
+}
+
+/* ===== Button ===== */
+.c-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    height: 5.6rem;
+    padding: 0 2.4rem;
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    line-height: 1;
+    color: var(--color-text-invert);
+    cursor: pointer;
+    background-color: var(--color-primary);
+    border: none;
+    border-radius: var(--radius-sm);
+    transition:
+        opacity var(--transition-fast),
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.c-btn--full {
+    width: 100%;
+}
+
+.c-btn:hover {
+    opacity: 0.92;
+}
+
+.c-btn:active {
+    transform: translateY(1px);
+}
+
+.c-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    box-shadow: none;
+}
+
+.c-btn--shadow {
+    box-shadow: var(--shadow-button);
+}
+
+/* 변형: Primary (그라데이션) */
+.c-btn--primary {
+    background: var(--gradient-button);
+    box-shadow: var(--shadow-button);
+}
+
+.c-btn--primary:hover {
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.28);
+}
+
+/* 변형: Secondary (라인) */
+.c-btn--secondary {
+    color: var(--color-text-sub);
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+}
+
+.c-btn--secondary:hover {
+    background-color: var(--color-bg);
+    opacity: 1;
+}
+
+
+.c-btn--gray {
+    color: var(--color-text-sub);
+    background-color: var(--color-border);
+    box-shadow: 0 4px 12px rgba(226, 232, 240, 0.25);
+}
+
+.c-btn--gray:hover {
+    background-color: var(--color-bg-strong);
+    opacity: 1;
+}
+
+/* 변형: dark (검색 등) */
+.c-btn--dark {
+    background: var(--color-text-sub);
+}
+
+/* 변형: Ghost */
+.c-btn--ghost {
+    color: var(--color-text-label);
+    background-color: transparent;
+}
+
+.c-btn--ghost:hover {
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    opacity: 1;
+}
+
+/* 변형: Danger */
+.c-btn--danger {
+    background-color: var(--color-danger);
+}
+
+/* 크기 (Button) */
+.c-btn--46 {
+    height: 4.6rem; /* 46px */
+    padding: 0 1.8rem;
+    font-size: var(--font-size-base);
+}
+
+.c-btn--44 {
+    height: 4.4rem; /* 44px */
+    padding: 0 1.8rem;
+    font-size: var(--font-size-base);
+}
+
+.c-btn--40 {
+    height: 4rem; /* 40px */
+    padding: 0 1.6rem;
+    font-size: var(--font-size-sm);
+}
+
+.c-btn--38 {
+    height: 3.8rem; /* 38px */
+    padding: 0 1.4rem;
+    font-size: var(--font-size-sm);
+}
+
+.c-btn--36 {
+    height: 3.6rem; /* 36px */
+    padding: 0 1.4rem;
+    font-size: var(--font-size-sm);
+}
+
+.c-btn--32 {
+    height: 3.2rem; /* 32px */
+    padding: 0 2.5rem;
+    font-size: var(--font-size-xs);
+    border-radius: var(--radius-lg);
+}
+
+.c-btn--26 {
+    height: 2.6rem; /* 26px */
+    padding: 0 1rem;
+    font-size: var(--font-size-xxs);
+}
+
+/* 기존 별칭 */
+.c-btn--sm {
+    height: 4rem;
+    padding: 0 1.6rem;
+    font-size: var(--font-size-sm);
+}
+
+.c-btn--md {
+    height: 4.4rem;
+    padding: 0 1.8rem;
+    font-size: var(--font-size-base);
+}
+
+/* 너비 */
+.c-btn--full {
+    width: 100%;
+}
+
+/* ===== Select (커스텀) ===== */
+.c-select {
+    position: relative;
+    width: 100%;
+}
+
+.c-select__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 4.4rem;
+    padding: 0 1.6rem;
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text);
+    text-align: left;
+    cursor: pointer;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    outline: none;
+    transition:
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.c-select__trigger:hover {
+    border-color: #cbd5e1;
+}
+
+.c-select.is-open .c-select__trigger,
+.c-select__trigger:focus {
+    background-color: var(--color-white);
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-input);
+}
+
+.c-select__value {
+    font-size: var(--font-size-base);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.c-select__value.is-placeholder {
+    color: var(--color-text-light);
+}
+
+.c-select__arrow {
+    flex-shrink: 0;
+    width: 1.6rem;
+    height: 1.6rem;
+    margin-left: 1.2rem;
+    background: url("../img/ic_main_arrow.png") center / contain no-repeat;
+    transition: transform var(--transition-fast);
+}
+
+.c-select.is-open .c-select__arrow {
+    background-image: url("../img/ic_main_arrow-on.png");
+    transform: rotate(180deg);
+}
+
+.c-select__list {
+    position: absolute;
+    top: calc(100% + 0.4rem);
+    left: 0;
+    z-index: var(--z-dropdown);
+    display: none;
+    width: 100%;
+    max-height: 24rem;
+    padding: 0.4rem 0;
+    overflow-y: auto;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-dropdown);
+}
+
+.c-select.is-open .c-select__list {
+    display: block;
+}
+
+.c-select__option {
+    display: block;
+    width: 100%;
+    padding: 1.2rem 1.6rem;
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text);
+    text-align: left;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    transition:
+        background-color var(--transition-fast),
+        color var(--transition-fast);
+}
+
+.c-select__option:hover,
+.c-select__option.is-active {
+    color: var(--color-primary);
+    background-color: var(--color-bg-point);
+}
+
+.c-select.is-disabled .c-select__trigger {
+    color: var(--color-text-light);
+    cursor: not-allowed;
+    background-color: var(--color-bg-strong);
+    opacity: 0.7;
+}
+
+/* 크기 (Select) */
+.c-select--40 .c-select__trigger {
+    height: 4rem; /* 40px */
+    padding: 0 1.4rem;
+    font-size: var(--font-size-sm);
+}
+
+.c-select--40 .c-select__value {
+    font-size: var(--font-size-sm);
+}
+
+.c-select--40 .c-select__option {
+    padding: 1rem 1.4rem;
+    font-size: var(--font-size-sm);
+}
+
+.c-select--44 .c-select__trigger {
+    height: 4.4rem; /* 44px */
+    padding: 0 1.6rem;
+    font-size: var(--font-size-base);
+}
+
+.c-select--44 .c-select__value {
+    font-size: var(--font-size-sm);
+}
+
+.c-select--44 .c-select__option {
+    padding: 1.2rem 1.6rem;
+    font-size: var(--font-size-sm);
+}
+
+/* ===== File (커스텀 파일 선택기) ===== */
+.c-file-field {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+    width: 100%;
+}
+
+.c-file-field__label {
+    flex-shrink: 0;
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text);
+    white-space: nowrap;
+}
+
+.c-file {
+    position: relative;
+    display: flex;
+    flex: 1;
+    align-items: stretch;
+    min-width: 0;
+    height: 4rem; /* 40px */
+    overflow: hidden;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+.c-file__input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.c-file__display {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: var(--spacing-sm);
+    min-width: 0;
+    padding: 0 1.2rem;
+    background-color: var(--color-bg);
+}
+
+.c-file__name {
+    flex: 1;
+    overflow: hidden;
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.c-file__name.is-placeholder {
+    color: var(--color-text-light);
+}
+
+.c-file__clear {
+    display: none;
+    flex-shrink: 0;
+    width: 1.6rem;
+    height: 1.6rem;
+    padding: 0;
+    cursor: pointer;
+    background-color: #cbd5e1;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 3l6 6M9 3L3 9' stroke='%23fff' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 1rem 1rem;
+    border: none;
+    border-radius: var(--radius-full);
+}
+
+.c-file.has-file .c-file__clear {
+    display: block;
+}
+
+.c-file__btn {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    min-width: 8.8rem;
+    padding: 0 1.6rem;
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text);
+    cursor: pointer;
+    background-color: var(--color-white);
+    border: none;
+    border-left: 1px solid var(--color-border);
+}
+
+.c-file__btn:hover {
+    background-color: var(--color-bg);
+}
+
+/* 크기 (File) */
+.c-file--44 {
+    height: 4.4rem;
+}
+
+.c-file--44 .c-file__name,
+.c-file--44 .c-file__btn {
+    font-size: var(--font-size-base);
+}
+
+.c-file--42 {
+    height: 4.2rem;
+}
+
+.c-file--40 {
+    height: 4rem;
+}
+
+.c-file--27 {
+    height: 2.7rem;
+}
+
+.c-file--27 .c-file__display {
+    padding: 0 0.8rem;
+}
+
+.c-file--27 .c-file__name,
+.c-file--27 .c-file__btn {
+    font-size: var(--font-size-xxs);
+}
+
+.c-file--27 .c-file__btn {
+    min-width: 7.2rem;
+    padding: 0 1rem;
+}
+
+.c-file--27 .c-file__clear {
+    width: 1.4rem;
+    height: 1.4rem;
+    background-size: 0.8rem 0.8rem;
+}
+
+/* ===== Checkbox ===== */
+.c-check-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-20);
+}
+
+.c-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.c-check__input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.c-check__box {
+    position: relative;
+    flex-shrink: 0;
+    width: 1.8rem;
+    height: 1.8rem;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xs);
+    transition:
+        background-color var(--transition-fast),
+        border-color var(--transition-fast);
+}
+
+.c-check__box::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1.2rem;
+    height: 1.2rem;
+    content: "";
+    background: url("../img/ic_check_white.png") center / contain no-repeat;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    transition: opacity var(--transition-fast);
+}
+
+.c-check__input:checked + .c-check__box {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.c-check__input:checked + .c-check__box::after {
+    opacity: 1;
+}
+
+.c-check__input:focus-visible + .c-check__box {
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.c-check__input:disabled + .c-check__box {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.c-check__input:disabled ~ .c-check__label {
+    color: var(--color-text-light);
+    cursor: not-allowed;
+}
+
+.c-check__label {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    line-height: 1;
+    color: var(--color-text);
+}
+
+/* ===== Pagination ===== */
+/*
+  페이지 표시 규칙 (총 페이지 total, 현재 current)
+  - total ≤ 7 : 1 ~ total 전부 표시
+  - total ≥ 8 :
+    · 항상 1페이지, 마지막 페이지 표시
+    · 현재 페이지 ±1 표시
+    · 생략 구간은 .c-paging__dots (텍스트 …)
+    예) current=1  → 1 2 3 … 20
+    예) current=10 → 1 … 9 10 11 … 20
+    예) current=20 → 1 … 18 19 20
+*/
+.c-paging {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.c-paging__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.8rem;
+    height: 2.8rem;
+    padding: 0;
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-sub);
+    cursor: pointer;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    transition:
+        background-color var(--transition-fast),
+        border-color var(--transition-fast),
+        color var(--transition-fast);
+}
+
+.c-paging__btn:hover:not(:disabled):not(.is-active) {
+    background-color: var(--color-bg);
+}
+
+.c-paging__btn.is-active {
+    color: var(--color-text-invert);
+    cursor: default;
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.c-paging__btn:disabled,
+.c-paging__btn.is-disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+.c-paging__btn--prev,
+.c-paging__btn--next {
+    background-image: url("../img/ic_pagenation_arrow.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 1rem 1rem;
+    font-size: 0;
+    color: transparent;
+}
+
+.c-paging__btn--prev {
+    transform: rotate(180deg);
+}
+
+.c-paging__dots {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-xxs);
+    font-weight: var(--font-weight-medium);
+    line-height: 1;
+    color: var(--color-text-sub);
+    letter-spacing: 0.1em;
+}
+
+/* ===== Popup (레이어) ===== */
+/* 카드 내부 콘텐츠는 각 페이지에서 .c-popup__body / __footer 에 삽입 */
+.c-popup {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+}
+
+.c-popup.is-open {
+    display: flex;
+}
+
+.c-popup__overlay {
+    position: absolute;
+    inset: 0;
+    background-color: var(--color-overlay-popup);
+    -webkit-backdrop-filter: blur(4px);
+    -moz-backdrop-filter: blur(4px);
+    -ms-backdrop-filter: blur(4px);
+    -o-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+.c-popup__dialog {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 56rem;
+    max-height: calc(100vh - 8rem);
+    overflow: hidden;
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-popup);
+}
+
+.c-popup__header {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    padding: 2.4rem;
+}
+
+.c-popup__title {
+    margin: 0;
+    font-family: var(--font-family-point);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    color: var(--color-text);
+}
+
+.c-popup__close {
+    flex-shrink: 0;
+    width: 2.4rem;
+    height: 2.4rem;
+    padding: 0;
+    cursor: pointer;
+    background: url("../img/ic_rightmenu_close.png") center / 1.6rem auto no-repeat;
+    border: none;
+}
+
+.c-popup__body {
+    flex: 1;
+    min-height: 16rem;
+    padding: 0 var(--spacing-xl);
+    overflow-y: auto;
+}
+
+.c-popup__footer {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-20) var(--spacing-xl) var(--spacing-xl);
+}
+
+/* 수목 관리번호 검색 팝업 폭 */
+#treeSearchPopup .c-popup__dialog {
+    max-width: 64rem;
+}
+
+/* ===== 수목 관리번호 검색 팝업 콘텐츠 ===== */
+.l-treesearch__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.6rem;
+}
+
+.l-treesearch__bar .c-input {
+    flex: 1;
+    min-width: 0;
+}
+
+.l-treesearch__bar .c-btn {
+    flex-shrink: 0;
+}
+
+.l-treesearch__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.l-treesearch__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.6rem;
+    padding: 1.4rem 1.6rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.l-treesearch__item:last-child {
+    border-bottom: none;
+}
+
+.l-treesearch__info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 0;
+}
+
+.l-treesearch__id {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-point-text);
+}
+
+.l-treesearch__meta {
+    overflow: hidden;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-sub);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.l-treesearch__select {
+    flex-shrink: 0;
+    height: 3.2rem;
+    padding: 0 1.4rem;
+    cursor: pointer;
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-point-text);
+    background-color: var(--color-bg-point);
+    border: none;
+    border-radius: var(--radius-sm);
+    transition: background-color var(--transition-fast);
+}
+
+.l-treesearch__select:hover {
+    background-color: #d1fae5;
+}
+
+/* 가이드/미리보기용 — 페이지 전체를 가리지 않음 */
+.c-popup--inline {
+    position: relative;
+    inset: auto;
+    z-index: 1;
+    width: 100%;
+    min-height: 36rem;
+    padding: var(--spacing-xl);
+}
+
+.c-popup--inline .c-popup__overlay {
+    border-radius: var(--radius-md);
+}
+
+.c-popup--inline .c-popup__dialog {
+    max-height: 32rem;
+}
+
+/* ===== Month Picker (년·월 선택) ===== */
+.c-monthpicker {
+    position: relative;
+    width: 100%;
+}
+
+.c-monthpicker__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    width: 100%;
+    height: 4.4rem;
+    padding: 0 1.6rem;
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text);
+    text-align: left;
+    cursor: pointer;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    outline: none;
+    transition:
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast),
+        background-color var(--transition-fast);
+}
+
+.c-monthpicker__trigger:hover {
+    border-color: #cbd5e1;
+}
+
+.c-monthpicker.is-open .c-monthpicker__trigger,
+.c-monthpicker__trigger:focus {
+    background-color: var(--color-white);
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-input);
+}
+
+.c-monthpicker__value {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.c-monthpicker__value.is-placeholder {
+    color: var(--color-text-light);
+}
+
+.c-monthpicker__icon {
+    flex-shrink: 0;
+    width: 1.8rem;
+    height: 1.8rem;
+    background: url("../img/ic_ai_calendar.png") center / contain no-repeat;
+}
+
+.c-monthpicker__panel {
+    position: absolute;
+    top: calc(100% + 0.4rem);
+    left: 0;
+    z-index: var(--z-dropdown);
+    width: 100%;
+    min-width: 28rem;
+    padding: 1.6rem;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-dropdown);
+}
+
+.c-monthpicker__panel[hidden] {
+    display: none;
+}
+
+.c-monthpicker__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.2rem;
+}
+
+.c-monthpicker__year {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text);
+}
+
+.c-monthpicker__nav {
+    width: 2.8rem;
+    height: 2.8rem;
+    cursor: pointer;
+    background-color: transparent;
+    background-image: url("../img/ic_pagenation_arrow.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 1rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-size: 0;
+    color: transparent;
+}
+
+.c-monthpicker__nav--prev {
+    transform: rotate(180deg);
+}
+
+.c-monthpicker__nav:hover:not(:disabled) {
+    background-color: var(--color-bg);
+}
+
+.c-monthpicker__nav:disabled,
+.c-monthpicker__nav.is-disabled {
+    cursor: not-allowed;
+    opacity: 0.35;
+}
+
+.c-monthpicker__months {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.8rem;
+}
+
+.c-monthpicker__month {
+    height: 3.6rem;
+    padding: 0;
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-sub);
+    cursor: pointer;
+    background-color: var(--color-bg);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    transition:
+        background-color var(--transition-fast),
+        border-color var(--transition-fast),
+        color var(--transition-fast);
+}
+
+.c-monthpicker__month:hover:not(:disabled):not(.is-active) {
+    border-color: var(--color-border);
+    background-color: var(--color-white);
+}
+
+.c-monthpicker__month:disabled,
+.c-monthpicker__month.is-disabled {
+    color: var(--color-text-light);
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.c-monthpicker__month.is-active {
+    color: var(--color-white);
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.c-monthpicker--40 .c-monthpicker__trigger {
+    height: 4rem;
+    padding: 0 1.4rem;
+    font-size: var(--font-size-sm);
+}
+
+/* ===== No data (검색/목록 결과 없음) ===== */
+.c-nodata {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 32rem;
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.c-nodata__visual {
+    display: block;
+    width: 16rem;
+    height: auto;
+    margin-bottom: 2rem;
+}
+
+.c-nodata__title {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text);
+}
+
+.c-nodata__desc {
+    margin: 0.5rem 0 0;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: #94A3B8;
+}

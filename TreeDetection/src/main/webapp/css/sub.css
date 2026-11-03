@@ -1449,85 +1449,36 @@
 }
 
 /* ----- LiDAR 탐지 화면 ----- */
+
 .l-detect__card--view {
+    display: flex;
+    flex-direction: column;
     min-height: 0;
 }
 
 .l-detect__view {
     position: relative;
     flex: 1;
+    width: 100%;
     min-height: 42rem;
     overflow: hidden;
     border-radius: var(--radius-lg);
     background-color: #0f172a;
 }
 
-.l-detect__view-bg {
+#viewer {
     position: absolute;
     inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #0f172a;
+}
+
+#viewer canvas {
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-}
-
-.l-detect__bbox {
-    position: absolute;
-    z-index: 1;
-    box-sizing: border-box;
-    border: 2px solid currentColor;
-    border-radius: 0.2rem;
-    cursor: pointer;
-    pointer-events: auto;
-    transition:
-        border-width var(--transition-fast),
-        box-shadow var(--transition-fast);
-}
-
-.l-detect__bbox--tree {
-    color: var(--detect-tree);
-}
-
-.l-detect__bbox--pole {
-    color: var(--detect-pole);
-}
-
-.l-detect__bbox--lamp {
-    color: var(--detect-lamp);
-}
-
-.l-detect__bbox--etc {
-    color: var(--detect-etc);
-}
-
-/* 선택된 bbox: 5px + 네온 glow */
-.l-detect__bbox.is-active {
-    z-index: 2;
-    border-width: 5px;
-    box-shadow:
-        0 0 6px currentColor,
-        0 0 14px currentColor,
-        0 0 26px color-mix(in srgb, currentColor 55%, transparent);
-}
-
-.l-detect__bbox-label {
-    position: absolute;
-    top: 0;
-    left: 0;
-    padding: 0.2rem 0.6rem;
-    font-size: var(--font-size-xxs);
-    font-weight: var(--font-weight-bold);
-    line-height: 1.4;
-    color: var(--color-white);
-    border-radius: 0 0 0.2rem 0;
-}
-
-.l-detect__bbox--tree .l-detect__bbox-label {
-    background-color: var(--detect-tree);
-}
-
-.l-detect__bbox--pole .l-detect__bbox-label {
-    background-color: var(--detect-pole);
 }
 
 /* ----- 탐지 결과 요약 ----- */

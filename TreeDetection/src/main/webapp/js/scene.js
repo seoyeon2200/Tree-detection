@@ -5,7 +5,7 @@ const viewer = document.getElementById("viewer");
 
 // Scene
 export const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x10151f);
+scene.background = new THREE.Color(0x1E293B);
 
 // Camera
 export const camera = new THREE.PerspectiveCamera(

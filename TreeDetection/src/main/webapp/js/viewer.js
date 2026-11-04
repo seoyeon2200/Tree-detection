@@ -6,8 +6,6 @@ import { parseLAS } from "./lasParser.js";
 import { createPointCloud } from "./pointCloud.js";
 import { createTreeBoxes } from "./treeBoxes.js";
 
-
-const status = document.getElementById("status");
 const treeList = document.getElementById("tree-list");
 const detectedTreeCount = document.getElementById("detected-tree-count");
 const treeCount = document.getElementById("tree-count");
@@ -21,6 +19,7 @@ let trees = [];
 let selectedTreeId = null;
 let treeBoxController = null;
 
+
 function displayValue(value) {
   if (
     value === null ||
@@ -32,7 +31,6 @@ function displayValue(value) {
 
   return String(value);
 }
-
 
 function selectTree(tree) {
   if (!tree) return;
@@ -74,17 +72,10 @@ function selectTree(tree) {
   // 3D 상자 선택 (빨간색 변경)
   const result = treeBoxController?.selectTree(tree);
 
-  // 상태 표시
-  if (status) {
-    status.textContent =
-      `선택한 나무: ${displayValue(tree.label)} (${selectedTreeId})`;
-  }
-
   return result;
 }
 
 function renderTreeList() {
-
   if (!treeList) return;
 
   treeList.replaceChildren();
@@ -349,17 +340,21 @@ function renderTreeDetail(tree) {
       ? `${tree.crownWidthM} m`
       : "-"
   );
-
 }
 
 async function loadViewer() {
+  const loading = document.getElementById("las-loading");
+  const loadingText = document.getElementById("las-loading-text");
+  
+  loading?.classList.remove("hidden");
+  
+  if (loadingText) {
+        loadingText.textContent = "파일을 불러오는 중입니다...";
+  }
+  
   try {
-
     const buffer = await fetchLAS();
     const data = parseLAS(buffer);
-    
-    console.log("LAS 파일 로딩 성공:", buffer.byteLength, "bytes");
-	console.log("LAS 점 개수:", data.positions.length / 3);
 
     if (!data.positions || data.positions.length === 0) {
       throw new Error("LAS 점군 데이터가 비어 있습니다.");
@@ -372,11 +367,7 @@ async function loadViewer() {
 	
 	// JSON 데이터로 목록 생성
 	renderTreeList();
-	    
-    console.log("나무 JSON 로딩 성공");
-	console.log("전체 나무 개수:", trees.length);
-	console.log("첫 번째 나무 데이터:", trees[0]);
-
+	
     // 점군 중심을 기준 원점으로 변환
     const pointCloudResult = createPointCloud(data);
 
@@ -401,7 +392,7 @@ async function loadViewer() {
     // 초기 카메라를 점군 중심으로 설정
     const center = pointCloudResult.center;
     const distance = Math.max(
-      pointCloudResult.radius * 2.5,
+      pointCloudResult.radius * 0.2,
       1
     );
 
@@ -416,9 +407,14 @@ async function loadViewer() {
     camera.lookAt(center);
     controls.update();
     resizeViewer();
+    
+    loading?.classList.add("hidden");
 	
   	} catch (error) {
     console.error(error);
+    if (loadingText) {
+      loadingText.textContent = "LAS 데이터를 불러오지 못했습니다.";
+    }
   }
 }
 

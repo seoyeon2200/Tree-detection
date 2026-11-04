@@ -28,7 +28,6 @@ function displayValue(value) {
   ) {
     return "-";
   }
-
   return String(value);
 }
 
@@ -70,7 +69,7 @@ function selectTree(tree) {
   renderTreeDetail(tree);
 
   // 3D 상자 선택 (빨간색 변경)
-  const result = treeBoxController?.selectTree(tree);
+  const result = treeBoxController?.selectTreeBox(tree);
 
   return result;
 }
@@ -377,7 +376,7 @@ async function loadViewer() {
 	  pointCloudResult.origin
 	);
 	
-	// 3D 상자를 클릭하면 main.js의 selectTree() 호출
+	// 3D 상자를 클릭하면 selectTree() 호출
 	const canvas = document.querySelector("#viewer canvas");
 	
 	if (!canvas) {

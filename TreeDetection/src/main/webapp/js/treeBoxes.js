@@ -144,7 +144,7 @@ export function createTreeBoxes(trees, origin) {
   }
 
   // 나무 선택
-  function selectTree(tree) {
+  function selectTreeBox(tree) {
     if (!tree) return null;
 
     const previousId = selectedTreeId;
@@ -336,7 +336,7 @@ export function createTreeBoxes(trees, origin) {
     created,
     skipped,
     total: trees.length,
-    selectTree,
+    selectTreeBox,
     bindPointerEvents,
     getBox: (treeId) =>
       treeBoxMap.get(String(treeId)) ?? null
